@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HarvestFlow</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f7ef;
+  color: #23412e;
+}
+header {
+  background: #205c3b;
+  color: white;
+  padding: 22px;
+  text-align: center;
+}
+main {
+  max-width: 850px;
+  margin: 20px auto;
+  padding: 15px;
+}
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #ccd8c9;
+}
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+}
+input, select, button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-top: 6px;
+  border: 1px solid #b7cbb9;
+  border-radius: 7px;
+  font-size: 16px;
+}
+button {
+  background: #26834a;
+  color: white;
+  border: none;
+  margin-top: 18px;
+  font-weight: bold;
+}
+.result {
+  background: #e2f3df;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌱 HarvestFlow</h1>
+  <p>AI-Powered Post-Harvest Crop Rescue</p>
+  <p>Manage your crop journey after harvesting.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>🌾 Enter Crop Details</h2>
+
+    <label for="crop">Crop type</label>
+    <select id="crop">
+      <option>Tomato</option>
+      <option>Potato</option>
+      <option>Onion</option>
+      <option>Banana</option>
+      <option>Mango</option>
+      <option>Other</option>
+    </select>
+
+    <label for="quantity">Quantity (kg)</label>
+    <input id="quantity" type="number" min="1"
+           placeholder="Example: 500">
+
+    <label for="harvest">Harvest date</label>
+    <input id="harvest" type="date">
+
+    <label for="storage">Storage condition</label>
+    <select id="storage">
+      <option value="good">Good / refrigerated</option>
+      <option value="basic">Basic storage</option>
+      <option value="poor">Poor / no proper storage</option>
+    </select>
+
+    <button onclick="analyzeCrop()">Assess Crop Urgency</button>
+
+    <div id="result" class="result" hidden aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2>📊 Crop Record Dashboard</h2>
+    <p>Crop: <strong id="dashCrop">Not entered</strong></p>
+    <p>Quantity: <strong id="dashQty">0 kg</strong></p>
+    <p>Assessment records: <strong id="records">0</strong></p>
+    <p><small>Records are kept in this page during the current session.</small></p>
+  </section>
+
+  <section class="card">
+    <h2>♻️ HarvestFlow Goals</h2>
+    <p>• Help farmers make informed post-harvest decisions.</p>
+    <p>• Explore selling, storage and processing options.</p>
+    <p>• Support efforts to reduce avoidable food loss.</p>
+  </section>
+</main>
+
+<script>
+let recordCount = 0;
+
+function analyzeCrop() {
+  const crop = document.getElementById("crop").value;
+  const quantity = Number(document.getElementById("quantity").value);
+  const harvest = document.getElementById("harvest").value;
+  const storage = document.getElementById("storage").value;
+  const result = document.getElementById("result");
+
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    alert("Please enter a quantity greater than zero.");
+    return;
+  }
+
+  if (!harvest) {
+    alert("Please select the harvest date.");
+    return;
+  }
+
+  const selectedDate = new Date(harvest + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (Number.isNaN(selectedDate.getTime()) ||
+      selectedDate > today) {
+    alert("Please enter a valid harvest date today or earlier.");
+    return;
+  }
+
+  let urgency;
+  let advice;
+
+  if (storage === "poor") {
+    urgency = "HIGH ATTENTION";
+    advice = "Inspect the crop promptly and explore suitable selling or processing options.";
+  } else if (storage === "basic") {
+    urgency = "REVIEW SOON";
+    advice = "Check crop condition and compare local selling, storage and processing options.";
+  } else {
+    urgency = "CHECK CONDITION";
+    advice = "Continue monitoring crop condition and verify that storage remains suitable.";
+  }
+
+  result.hidden = false;
+  result.innerHTML =
+    "<h3>Assessment: " + urgency + "</h3>" +
+    "<p><strong>Crop:</strong> " + crop + "</p>" +
+    "<p><strong>Quantity:</strong> " + quantity + " kg</p>" +
+    "<p><strong>Suggested next step:</strong> " + advice + "</p>" +
+    "<p><small>This is a basic rule-based demonstration, not a validated AI prediction or shelf-life estimate. Inspect the crop and check local conditions.</small></p>";
+
+  document.getElementById("dashCrop").textContent = crop;
+  document.getElementById("dashQty").textContent = quantity + " kg";
+  recordCount++;
+  document.getElementById("records").textContent = recordCount;
+}
+</script>
+
+</body>
+</html>
